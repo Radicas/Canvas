@@ -1,0 +1,3 @@
+[submodule "submodule/redcgl"]
+	path = submodule/redcgl
+	url = https://github.com/Radicas/redcgl.git
