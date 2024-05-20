@@ -10,7 +10,7 @@
 #include <memory>
 
 MainWindow::MainWindow(const std::shared_ptr<Context>& aContext)
-    : _view(nullptr), _context(aContext), _fsm(std::make_shared<EditorFsm>())
+    : _view(nullptr), _context(aContext), _fsm(std::make_shared<EditorFsm>(*aContext))
 {
     setup();
 }
@@ -30,9 +30,9 @@ void MainWindow::setup()
     {
         return;
     }
-    _view = new GraphicsView(_fsm.get());
+    _view = new GraphicsView(*_context, _fsm.get());
     _view->setup();
-    const auto& scene = _context->getScene();
+    const auto& scene = _context->get_scene();
     _view->setScene(scene.get());
     setCentralWidget(_view);
     create_menu_bar();

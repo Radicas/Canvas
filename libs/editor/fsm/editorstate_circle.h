@@ -7,18 +7,19 @@
 
 #include "editorstate.h"
 
+class Context;
 class Editorstate_Circle : public EditorState
 {
    public:
-    Editorstate_Circle();
+    Editorstate_Circle(const Context& context);
     ~Editorstate_Circle();
 
     void entry();
     void exit();
 
-    int mouseMoveEvent(QMouseEvent* event);
-    int mousePressEvent(QMouseEvent* event);
-    int mouseReleaseEvent(QMouseEvent* event);
+    int mouseMoveEvent(QGraphicsSceneMouseEvent* event);
+    int mousePressEvent(QGraphicsSceneMouseEvent* event);
+    int mouseReleaseEvent(QGraphicsSceneMouseEvent* event);
 };
 
 #endif  //CANVAS_EDITORSTATE_CIRCLE_H

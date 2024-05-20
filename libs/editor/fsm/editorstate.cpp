@@ -1,6 +1,6 @@
 #include "editorstate.h"
 
-EditorState::EditorState() {}
+EditorState::EditorState(const Context& context) : _context(context) {}
 
 EditorState::~EditorState() {}
 
@@ -8,15 +8,15 @@ void EditorState::entry() {}
 
 void EditorState::exit() {}
 
-int EditorState::mouseMoveEvent(QMouseEvent* event)
+int EditorState::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }
-int EditorState::mousePressEvent(QMouseEvent* event)
+int EditorState::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }
-int EditorState::mouseReleaseEvent(QMouseEvent* event)
+int EditorState::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }

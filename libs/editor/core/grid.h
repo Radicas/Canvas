@@ -6,31 +6,32 @@
 
 class Grid {
 public:
-    enum GridType {
+    enum GRID_TYPE
+    {
         NONE,
         DOTS,
         LINES
     };
 
     Grid();
-    Grid(const Length& aIntervalX, const Length& aIntervalY);
+    Grid(const Length& interval_x, const Length& interval_y);
 
-    GridType getType() const { return mGridType; }
-    void setType(GridType aGridType) { mGridType = aGridType; }
+    GRID_TYPE get_type() const { return _grid_type; }
+    void setType(GRID_TYPE grid_type) { _grid_type = grid_type; }
 
-    const Length& getIntervalX() const { return mIntervalX; }
-    bool setIntervalX(const Length& aLength);
+    const Length& get_interval_x() const { return _interval_x; }
+    bool set_interval_x(const Length& length);
 
-    const Length& getIntervalY() const { return mIntervalY; }
-    bool setIntervalY(const Length& aLength);
+    const Length& get_interval_y() const { return _interval_y; }
+    bool set_interval_y(const Length& length);
 
-    void mapToGrid(Point& point);
-    Point mappedToGrid(const Point& point);
+    void map_to_grid(Point& point) const;
+    Point mapped_to_grid(const Point& point) const;
 
-private:
-    Length mIntervalX;
-    Length mIntervalY;
-    GridType mGridType;
+   private:
+    Length _interval_x;
+    Length _interval_y;
+    GRID_TYPE _grid_type;
 };
 
 #endif /* GRID_H_ */

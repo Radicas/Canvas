@@ -3,10 +3,12 @@
 #include "eventhandler.h"
 
 #include <QDebug>
+#include <QGraphicsSceneMouseEvent>
 #include <QScrollBar>
 #include <QWheelEvent>
 #include <cmath>
-GraphicsView::GraphicsView(EventHandler* eh) : is_panning(false), _event_handler(eh) {}
+
+GraphicsView::GraphicsView(const Context& context, EventHandler* event_handler) : _event_handler(event_handler) {}
 
 void GraphicsView::setup()
 {
@@ -20,37 +22,46 @@ void GraphicsView::setup()
 
 void GraphicsView::mouseMoveEvent(QMouseEvent* event)
 {
-    if (is_panning)
+    if (mIsPanning)
     {
         auto pos = event->pos();
-        auto delta = pos - _last_pos;
+        auto delta = pos - mLastPos;
         verticalScrollBar()->setValue(verticalScrollBar()->value() - delta.y());
         horizontalScrollBar()->setValue(horizontalScrollBar()->value() - delta.x());
-        _last_pos = pos;
+        mLastPos = pos;
     }
-    _event_handler->mouseMoveEvent(event);
+
+    QGraphicsSceneMouseEvent e;
+    e.setScenePos(mapToScene(event->pos()));
+    _event_handler->mouseMoveEvent(&e);
+    return QGraphicsView::mouseMoveEvent(event);
 }
 
 void GraphicsView::mousePressEvent(QMouseEvent* event)
 {
     if (event->buttons().testFlag(Qt::MiddleButton))
     {
-        is_panning = true;
-        _last_pos = event->pos();
+        mIsPanning = true;
+        mLastPos = event->pos();
     }
-
-    _event_handler->mousePressEvent(event);
+    QGraphicsSceneMouseEvent e;
+    e.setScenePos(mapToScene(event->pos()));
+    _event_handler->mousePressEvent(&e);
+    return QGraphicsView::mousePressEvent(event);
 }
 
 void GraphicsView::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (is_panning)
+    if (mIsPanning)
     {
-        is_panning = false;
+        mIsPanning = false;
         event->accept();
         return;
     }
-    _event_handler->mouseReleaseEvent(event);
+    QGraphicsSceneMouseEvent e;
+    e.setScenePos(mapToScene(event->pos()));
+    _event_handler->mouseReleaseEvent(&e);
+    return QGraphicsView::mouseReleaseEvent(event);
 }
 
 void GraphicsView::wheelEvent(QWheelEvent* event)
@@ -108,11 +119,11 @@ void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
 
     QPen oldPen = painter->pen();
     QPen newPen(oldPen);
-    newPen.setColor(Qt::red);
+    newPen.setColor(Qt::yellow);
     newPen.setCosmetic(true);
     painter->setPen(newPen);
-    painter->drawLine(-(int)width, 0, (int)width, 0);
-    painter->drawLine(0, (int)height, 0, -(int)height);
+    painter->drawLine(-width, 0, width, 0);
+    painter->drawLine(0, height, 0, -height);
     painter->setPen(oldPen);
 }
 
@@ -120,7 +131,7 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
 {
     QGraphicsView::drawBackground(painter, rect);
 
-    if (_grid.getType() == Grid::NONE)
+    if (mGrid.get_type() == Grid::NONE)
     {
         return;
     }
@@ -131,8 +142,8 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
     newPen.setCosmetic(true);
     painter->setPen(newPen);
 
-    double intervalX = _grid.getIntervalX();
-    double intervalY = _grid.getIntervalY();
+    double intervalX = mGrid.get_interval_x();
+    double intervalY = mGrid.get_interval_y();
 
     // qDebug() << startX << endX << startY << endY;
 
@@ -157,7 +168,7 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
     double endY = std::ceil(maxY / intervalY) * intervalY;
 
     // int count = 0;
-    switch (_grid.getType())
+    switch (mGrid.get_type())
     {
         case Grid::DOTS:
         {
@@ -190,8 +201,6 @@ void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
             painter->drawLines(lines.data(), lines.size());
         }
         break;
-        case Grid::NONE:
-            break;
     }
 
     // qDebug() << count;

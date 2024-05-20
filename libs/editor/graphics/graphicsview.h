@@ -1,33 +1,31 @@
-#ifndef VIEW_H_
-#define VIEW_H_
-
-#include "core/grid.h"
+#ifndef GRAPHICS_VIEW_H_
+#define GRAPHICS_VIEW_H_
 
 #include <QGraphicsView>
+#include "core/grid.h"
 
+class Context;
 class EventHandler;
 class GraphicsView : public QGraphicsView
 {
    public:
-    explicit GraphicsView(EventHandler* eh);
+    GraphicsView(const Context& context, EventHandler* event_handler);
 
     virtual void setup();
-
    protected:
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event);
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
     void wheelEvent(QWheelEvent* event) override;
     void drawForeground(QPainter* painter, const QRectF& rect) override;
     void drawBackground(QPainter* painter, const QRectF& rect) override;
 
     virtual void scrollWithDegrees(const QPoint& numSteps);
-
    private:
-    bool is_panning;
-    QPoint _last_pos;
-    Grid _grid;
+    bool mIsPanning;
+    QPoint mLastPos;
+    Grid mGrid;
     EventHandler* _event_handler;
 };
 
-#endif /* VIEW_H_ */
+#endif /* GRAPHICS_VIEW_H_ */

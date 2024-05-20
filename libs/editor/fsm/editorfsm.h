@@ -13,26 +13,28 @@ enum FSM_STATE
     DRAW_CIRCLE,
 };
 
+class Context;
 class EditorState;
 class EditorFsm : public QObject, public EventHandler
 {
    public:
-    EditorFsm();
+    explicit EditorFsm(const Context& context);
     ~EditorFsm();
 
     void set_current_state(FSM_STATE state);
 
     FSM_STATE get_current_state();
 
-    int mouseMoveEvent(QMouseEvent* event) override;
-    int mousePressEvent(QMouseEvent* event) override;
-    int mouseReleaseEvent(QMouseEvent* event) override;
+    int mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    int mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    int mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
    private:
     void setup();
 
     std::map<FSM_STATE, EditorState*> _fsm_states;
     FSM_STATE _current_state;
+    const Context& _context;
 };
 
 #endif  //CANVAS_EDITORFSM_H

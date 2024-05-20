@@ -10,36 +10,36 @@ Grid::Grid()
 {
 }
 
-Grid::Grid(const Length &aIntervalX, const Length &aIntervalY)
-    : mGridType(GridType::DOTS)
+Grid::Grid(const Length& interval_x, const Length& interval_y) : _grid_type(GRID_TYPE::DOTS)
 {
-    setIntervalX(aIntervalX);
-    setIntervalY(aIntervalY);
+    set_interval_x(interval_x);
+    set_interval_y(interval_y);
 }
 
-bool Grid::setIntervalX(const Length &aLength)
+bool Grid::set_interval_x(const Length& length)
 {
-    if (aLength > 0) {
-        mIntervalX = aLength;
+    if (length > 0)
+    {
+        _interval_x = length;
         return true;
     }
     return false;
 }
 
-bool Grid::setIntervalY(const Length &aLength)
+bool Grid::set_interval_y(const Length& length)
 {
-    if (aLength > 0) {
-        mIntervalY = aLength;
+    if (length > 0)
+    {
+        _interval_y = length;
         return true;
     }
     return false;
 }
 
-void Grid::mapToGrid(Point &point)
+void Grid::map_to_grid(Point& point) const
 {
     Length x = point.x();
     Length y = point.y();
-
 
     auto mapLengthToGrid = [](Length& value, const Length& interval) {
         R_ASSERT(interval > 0);
@@ -57,7 +57,7 @@ void Grid::mapToGrid(Point &point)
             uValueAbs = - static_cast<UnsignedLength>(value);
         }
 
-        UnsignedLength uInterval = static_cast<UnsignedLength>(interval);
+        auto uInterval = static_cast<UnsignedLength>(interval);
         UnsignedLength uMapped;
 
         UnsignedLength uRemainder = uValueAbs % uInterval;
@@ -79,16 +79,16 @@ void Grid::mapToGrid(Point &point)
         }
     };
 
-    mapLengthToGrid(x, mIntervalX);
-    mapLengthToGrid(y, mIntervalY);
+    mapLengthToGrid(x, _interval_x);
+    mapLengthToGrid(y, _interval_y);
 
-    point.setX(x);
-    point.setY(y);
+    point.setX((int)x);
+    point.setY((int)y);
 }
 
-Point Grid::mappedToGrid(const Point &point)
+Point Grid::mapped_to_grid(const Point& point) const
 {
     Point p = point;
-    mapToGrid(p);
+    map_to_grid(p);
     return p;
 }

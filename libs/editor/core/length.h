@@ -1,9 +1,8 @@
-#ifndef LENGTH_H_
-#define LENGTH_H_
+#ifndef CANVAS_LENGTH_H
+#define CANVAS_LENGTH_H
 
-#include <cinttypes>
+#include <limits>
 
-// 这里以前的结构是个类，但是新的结构要如何处理其实还没有确定，因此暂时写成 typedef
-typedef int32_t Length;
+typedef uint32_t Length;
 
-#endif /* LENGTH_H_ */
+#endif  //CANVAS_LENGTH_H

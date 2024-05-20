@@ -4,5 +4,5 @@
 
 Context::Context()
 {
-    mScene = std::make_shared<QGraphicsScene>();
+    _scene = std::make_shared<QGraphicsScene>();
 }

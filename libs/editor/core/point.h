@@ -1,8 +1,8 @@
-#ifndef POINT_H_
-#define POINT_H_
+#ifndef CANVAS_POINT_H
+#define CANVAS_POINT_H
 
 #include <QPoint>
 
 typedef QPoint Point;
 
-#endif /* POINT_H_ */
+#endif  //CANVAS_POINT_H
