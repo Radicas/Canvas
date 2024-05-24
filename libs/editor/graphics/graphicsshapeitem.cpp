@@ -1,5 +1,5 @@
 #include "graphicsshapeitem.h"
-#include "logic/polygon_shape_logic.h"
+#include "convertor.h"
 
 GraphicsShapeItem::GraphicsShapeItem(const std::vector<redcgl::Edge>& edges)
     : _pen(Qt::red, 0), _brush(Qt::green), _rect(), _path()
@@ -12,6 +12,10 @@ GraphicsShapeItem::~GraphicsShapeItem() {}
 QRectF GraphicsShapeItem::boundingRect() const
 {
     return _rect;
+}
+QPainterPath GraphicsShapeItem::shape() const
+{
+    return _path;
 }
 int GraphicsShapeItem::set_edges(const std::vector<redcgl::Edge>& edges)
 {
@@ -33,6 +37,8 @@ int GraphicsShapeItem::set_edges(const std::vector<redcgl::Edge>& edges)
         _polygon.edges[i] = edges[i];
     }
     redcgl::aabb_of_polygon(&_polygon, &_polygon.bbox);
+    auto& box = _polygon.bbox;
+    _rect.setRect(box.min.x, box.min.y, (box.max.x - box.min.x), (box.min.y - box.max.y));
     return 1;
 }
 int GraphicsShapeItem::append_edge(const redcgl::Edge& edge)
@@ -73,6 +79,7 @@ void GraphicsShapeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->setPen(_pen);
     painter->setBrush(_brush);
     painter->drawPath(_path);
+    painter->drawRect(_rect);
 }
 
 int GraphicsShapeItem::init_polygon()
@@ -81,11 +88,24 @@ int GraphicsShapeItem::init_polygon()
     return 1;
 }
 
+int GraphicsShapeItem::set_path_to_circle()
+{
+    auto& edge = _polygon.edges[0];
+    const QtArc arc = edge_to_qt_arc(edge);
+    _path.moveTo(edge.st.x, edge.st.y);
+    _path.arcTo(arc._rect, arc._start_angle / 16, arc._span_angle / 16);
+    return 1;
+}
+
 int GraphicsShapeItem::init_painter_path()
 {
     redcgl::Polygon* curr_poly = &_polygon;
     if (curr_poly == nullptr || curr_poly->edges == nullptr)
         return -1;
+
+    // 当前shape是圆
+    if (curr_poly->num_edges == 1 && curr_poly->edges[0].r != 0.0)
+        return set_path_to_circle();
 
     redcgl::Edge* first_edge = &curr_poly->edges[0];
     _path.moveTo(first_edge->st.x, first_edge->st.y);  // 路径起点

@@ -13,6 +13,7 @@ class GraphicsShapeItem : public QGraphicsItem
     ~GraphicsShapeItem();
 
     QRectF boundingRect() const override;
+    QPainterPath shape() const override;
 
     int set_pen(const QPen& pen);
     int set_brush(const QBrush& brush);
@@ -24,6 +25,7 @@ class GraphicsShapeItem : public QGraphicsItem
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
     int init_polygon();
     int init_painter_path();
+    int set_path_to_circle();
 
    private:
     QPen _pen;

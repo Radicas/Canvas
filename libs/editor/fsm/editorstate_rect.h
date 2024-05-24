@@ -1,9 +1,5 @@
-//
-// Created by Radica on 2024/5/19.
-//
-
-#ifndef CANVAS_EDITORSTATE_CIRCLE_H
-#define CANVAS_EDITORSTATE_CIRCLE_H
+#ifndef CANVAS_EDITORSTATE_RECT_H
+#define CANVAS_EDITORSTATE_RECT_H
 
 #include "core/context.h"
 #include "core/grid.h"
@@ -21,7 +17,7 @@
 #include <QPen>
 #include <QPointF>
 
-class Editorstate_Circle : public EditorState
+class Editorstate_Rect : public EditorState
 {
    public:
     enum class STATE
@@ -30,8 +26,8 @@ class Editorstate_Circle : public EditorState
         ADD_RECT,
     };
 
-    Editorstate_Circle(const Context& context);
-    ~Editorstate_Circle();
+    Editorstate_Rect(const Context& context);
+    ~Editorstate_Rect();
 
     void entry() override;
     void exit() override;
@@ -44,37 +40,36 @@ class Editorstate_Circle : public EditorState
 
    protected:
     void setup();
-    void add_circle();
+    void add_rect();
     void clear_cache();
 
    private:
     QPointF _last_point{};                           // 上次点击的坐标
     QPointF _cursor_point{};                         // 当前点击的坐标
     STATE _state;                                    // 操作状态
-    QGraphicsEllipseItem* _preview;                  // 预览矩形
-    double _radius;                                  // 圆形半径
+    QGraphicsRectItem* _preview;                     // 预览矩形
     std::vector<redcgl::Edge> _shape_edges{};        // shape的边
     std::vector<GraphicsShapeItem*> _shape_items{};  // 已有shape绘制对象
     QPen _pen;
     QBrush _brush;
 };
 
-Editorstate_Circle::Editorstate_Circle(const Context& context) : EditorState(context)
+Editorstate_Rect::Editorstate_Rect(const Context& context) : EditorState(context)
 {
     setup();
 }
-Editorstate_Circle::~Editorstate_Circle() {}
-void Editorstate_Circle::entry()
+Editorstate_Rect::~Editorstate_Rect() {}
+void Editorstate_Rect::entry()
 {
     printf("enter draw rect\n");
     EditorState::entry();
 }
-void Editorstate_Circle::exit()
+void Editorstate_Rect::exit()
 {
     printf("exit draw rect\n");
     EditorState::exit();
 }
-int Editorstate_Circle::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Rect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     Grid g;
     Point p = event->scenePos().toPoint();
@@ -86,18 +81,16 @@ int Editorstate_Circle::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
             break;
         case STATE::ADD_RECT:
         {
-            _radius = redcgl::dist_pt_vs_pt(_last_point.x(), _last_point.y(), _cursor_point.x(), _cursor_point.y());
-            QRectF rect(_last_point.x() - _radius, _last_point.y() - _radius, 2 * _radius, 2 * _radius);
+            QRectF rect(_last_point.x(), _last_point.y(), _cursor_point.x() - _last_point.x(),
+                        _cursor_point.y() - _last_point.y());
             _preview->setRect(rect);
-            _preview->setStartAngle(0);
-            _preview->setSpanAngle(360 * 16);
             _preview->update();
         }
         break;
     }
     return EditorState::mouseMoveEvent(event);
 }
-int Editorstate_Circle::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Rect::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
 {
     Grid g;
     Point p = event->scenePos().toPoint();
@@ -114,7 +107,7 @@ int Editorstate_Circle::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
         }
         case STATE::ADD_RECT:
         {
-            add_circle();
+            add_rect();
             clear_cache();
             _state = STATE::IDLE;
             break;
@@ -124,43 +117,51 @@ int Editorstate_Circle::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
     }
     return EditorState::mouseLeftPressEvent(event);
 }
-int Editorstate_Circle::mouseRightPressEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Rect::mouseRightPressEvent(QGraphicsSceneMouseEvent* event)
 {
     return EditorState::mouseRightPressEvent(event);
 }
-int Editorstate_Circle::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Rect::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
     return EditorState::mouseDoubleClickEvent(event);
 }
-int Editorstate_Circle::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Rect::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     return EditorState::mouseReleaseEvent(event);
 }
 
-void Editorstate_Circle::setup()
+void Editorstate_Rect::setup()
 {
     _pen = {Qt::red, 0};
     _brush = {Qt::green};
-    _preview = new QGraphicsEllipseItem();
+    _preview = new QGraphicsRectItem();
     _preview->setPen(_pen);
     _preview->setBrush(_brush);
 }
-void Editorstate_Circle::add_circle()
+void Editorstate_Rect::add_rect()
 {
-    redcgl::Edge e;
-    e.st = e.et = {_last_point.x() + _radius, _last_point.y()};
-    e.ct = {_last_point.x(), _last_point.y()};
-    e.sa = 0.0;
-    e.ea = 0.0;
-    e.r = _radius;
-    _shape_edges.emplace_back(e);
+    for (int i = 0; i < 4; ++i)
+    {
+        redcgl::Edge e;
+        redcgl::empty_edge(&e);
+        _shape_edges.emplace_back(e);
+    }
+    _shape_edges[0].st = {_last_point.x(), _last_point.y()};
+    _shape_edges[0].et = {_last_point.x(), _cursor_point.y()};
+    _shape_edges[1].st = {_last_point.x(), _cursor_point.y()};
+    _shape_edges[1].et = {_cursor_point.x(), _cursor_point.y()};
+    _shape_edges[2].st = {_cursor_point.x(), _cursor_point.y()};
+    _shape_edges[2].et = {_cursor_point.x(), _last_point.y()};
+    _shape_edges[3].st = {_cursor_point.x(), _last_point.y()};
+    _shape_edges[3].et = {_last_point.x(), _last_point.y()};
+
     auto* shape = new GraphicsShapeItem(_shape_edges);
     _context.get_scene()->addItem(shape);
 }
 
-void Editorstate_Circle::clear_cache()
+void Editorstate_Rect::clear_cache()
 {
     _context.get_scene()->removeItem(_preview);
     _shape_edges.clear();
 }
-#endif  //CANVAS_EDITORSTATE_CIRCLE_H
+#endif  //CANVAS_EDITORSTATE_RECT_H

@@ -10,6 +10,7 @@ enum FSM_STATE
 {
     SELECT = 0,
     DRAW_POLYGON,
+    DRAW_RECT,
     DRAW_CIRCLE,
 };
 

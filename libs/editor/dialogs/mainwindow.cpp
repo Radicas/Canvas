@@ -40,8 +40,8 @@ void MainWindow::setup()
 }
 
 std::map<std::string, FSM_STATE> action_fsm_map{
-    {"Select", FSM_STATE::SELECT},
     {"Polygon", FSM_STATE::DRAW_POLYGON},
+    {"Rect", FSM_STATE::DRAW_RECT},
     {"Circle", FSM_STATE::DRAW_CIRCLE},
 };
 
@@ -51,17 +51,17 @@ void MainWindow::create_menu_bar()
     QMenu* drawMenu = menuBar()->addMenu(tr("&Draw"));
     std::vector<QAction*> actions;
 
-    // 增加动作时只需要增加下面三种即可，同时写到上面的map里
-    auto* select = new QAction("Select");
+    // NOTE: 增加动作时只需要增加下面三种即可，同时写到上面的map里
     auto* drawPolygon = new QAction("Polygon");
+    auto* drawRect = new QAction("Rect");
     auto* drawCircle = new QAction("Circle");
 
-    drawMenu->addAction(select);
     drawMenu->addAction(drawPolygon);
+    drawMenu->addAction(drawRect);
     drawMenu->addAction(drawCircle);
 
-    actions.emplace_back(select);
     actions.emplace_back(drawPolygon);
+    actions.emplace_back(drawRect);
     actions.emplace_back(drawCircle);
 
     for (int i = 0; i < actions.size(); ++i)

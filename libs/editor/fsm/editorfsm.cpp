@@ -1,6 +1,7 @@
 #include "editorfsm.h"
 #include "editorstate_circle.h"
 #include "editorstate_polygon.h"
+#include "editorstate_rect.h"
 #include "editorstate_select.h"
 
 EditorFsm::EditorFsm(const Context& context) : _current_state(SELECT), _fsm_states(), _context(context)
@@ -20,6 +21,7 @@ EditorFsm::~EditorFsm()
 
 void EditorFsm::setup()
 {
+    _fsm_states[DRAW_RECT] = new Editorstate_Rect(_context);
     _fsm_states[SELECT] = new Editorstate_Select(_context);
     _fsm_states[DRAW_POLYGON] = new Editorstate_Polygon(_context);
     _fsm_states[DRAW_CIRCLE] = new Editorstate_Circle(_context);
