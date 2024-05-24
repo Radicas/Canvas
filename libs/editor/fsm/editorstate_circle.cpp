@@ -12,13 +12,19 @@ int Editorstate_Circle::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }
-int Editorstate_Circle::mousePressEvent(QGraphicsSceneMouseEvent* event)
+int Editorstate_Circle::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
 {
-    printf("draw circle press\n");
+    return 0;
+}
+int Editorstate_Circle::mouseRightPressEvent(QGraphicsSceneMouseEvent* event)
+{
+    return 0;
+}
+int Editorstate_Circle::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
+{
     return 0;
 }
 int Editorstate_Circle::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    printf("draw circle release\n");
     return 0;
 }

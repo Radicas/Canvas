@@ -44,7 +44,7 @@ void Grid::map_to_grid(Point& point) const
     auto mapLengthToGrid = [](Length& value, const Length& interval) {
         R_ASSERT(interval > 0);
 
-        using UnsignedLength = Length;
+        using UnsignedLength = std::make_unsigned<Length>::type;
 
         UnsignedLength uMaximum;
         UnsignedLength uValueAbs;

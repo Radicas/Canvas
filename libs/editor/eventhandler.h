@@ -8,7 +8,9 @@ class EventHandler
     EventHandler();
     ~EventHandler();
     virtual int mouseMoveEvent(QGraphicsSceneMouseEvent* event) = 0;
-    virtual int mousePressEvent(QGraphicsSceneMouseEvent* event) = 0;
+    virtual int mouseLeftPressEvent(QGraphicsSceneMouseEvent* event) = 0;
+    virtual int mouseRightPressEvent(QGraphicsSceneMouseEvent* event) = 0;
+    virtual int mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) = 0;
     virtual int mouseReleaseEvent(QGraphicsSceneMouseEvent* event) = 0;
 };
 

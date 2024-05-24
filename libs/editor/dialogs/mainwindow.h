@@ -19,8 +19,6 @@ class MainWindow : public QMainWindow
     void create_menu_bar();
 
    private slots:
-    void action_polygon_triggered();
-    void action_circle_triggered();
 
    private:
     GraphicsView* _view;

@@ -26,7 +26,9 @@ class EditorFsm : public QObject, public EventHandler
     FSM_STATE get_current_state();
 
     int mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
-    int mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+    int mouseLeftPressEvent(QGraphicsSceneMouseEvent* event) override;
+    int mouseRightPressEvent(QGraphicsSceneMouseEvent* event) override;
+    int mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
     int mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
    private:

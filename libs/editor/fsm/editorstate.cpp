@@ -12,7 +12,15 @@ int EditorState::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }
-int EditorState::mousePressEvent(QGraphicsSceneMouseEvent* event)
+int EditorState::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
+{
+    return 0;
+}
+int EditorState::mouseRightPressEvent(QGraphicsSceneMouseEvent* event)
+{
+    return 0;
+}
+int EditorState::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event)
 {
     return 0;
 }

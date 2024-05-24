@@ -20,9 +20,11 @@ add_library(${LIB_NAME} STATIC
 
 target_include_directories(${LIB_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/editor
+        ${CMAKE_SOURCE_DIR}/submodule
 )
 
 target_link_libraries(${LIB_NAME}
         Qt5::Core
         Qt5::Widgets
+        redcgl
 )

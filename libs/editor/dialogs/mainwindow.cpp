@@ -39,28 +39,38 @@ void MainWindow::setup()
     flag = true;
 }
 
+std::map<std::string, FSM_STATE> action_fsm_map{
+    {"Select", FSM_STATE::SELECT},
+    {"Polygon", FSM_STATE::DRAW_POLYGON},
+    {"Circle", FSM_STATE::DRAW_CIRCLE},
+};
+
 void MainWindow::create_menu_bar()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("&File"));
     QMenu* drawMenu = menuBar()->addMenu(tr("&Draw"));
+    std::vector<QAction*> actions;
 
+    // 增加动作时只需要增加下面三种即可，同时写到上面的map里
+    auto* select = new QAction("Select");
     auto* drawPolygon = new QAction("Polygon");
-    drawMenu->addAction(drawPolygon);
-    connect(drawPolygon, &QAction::triggered, this, &MainWindow::action_polygon_triggered);
-
     auto* drawCircle = new QAction("Circle");
+
+    drawMenu->addAction(select);
+    drawMenu->addAction(drawPolygon);
     drawMenu->addAction(drawCircle);
-    connect(drawCircle, &QAction::triggered, this, &MainWindow::action_circle_triggered);
-}
 
-void MainWindow::action_polygon_triggered()
-{
-    printf("change state to DRAW POLYGON\n");
-    _fsm->set_current_state(FSM_STATE::DRAW_POLYGON);
-}
+    actions.emplace_back(select);
+    actions.emplace_back(drawPolygon);
+    actions.emplace_back(drawCircle);
 
-void MainWindow::action_circle_triggered()
-{
-    printf("change state to DRAW CIRCLE\n");
-    _fsm->set_current_state(FSM_STATE::DRAW_CIRCLE);
+    for (int i = 0; i < actions.size(); ++i)
+    {
+        connect(actions[i], &QAction::triggered, this,
+                [i, actions, this]()
+                {
+                    auto action_name = actions[i]->text().toStdString();
+                    _fsm->set_current_state(action_fsm_map[action_name]);
+                });
+    }
 }

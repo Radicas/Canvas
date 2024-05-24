@@ -1,18 +1,18 @@
 //
-// Created by Radica on 2024/5/19.
+// Created by Radica on 2024/5/20.
 //
 
-#ifndef CANVAS_EDITORSTATE_CIRCLE_H
-#define CANVAS_EDITORSTATE_CIRCLE_H
+#ifndef CANVAS_EDITORSTATE_SELECT_H
+#define CANVAS_EDITORSTATE_SELECT_H
 
 #include "editorstate.h"
 
 class Context;
-class Editorstate_Circle : public EditorState
+class Editorstate_Select : public EditorState
 {
    public:
-    Editorstate_Circle(const Context& context);
-    ~Editorstate_Circle();
+    Editorstate_Select(const Context& context);
+    ~Editorstate_Select();
 
     void entry() override;
     void exit() override;
@@ -23,5 +23,4 @@ class Editorstate_Circle : public EditorState
     int mouseDoubleClickEvent(QGraphicsSceneMouseEvent* event) override;
     int mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 };
-
-#endif  //CANVAS_EDITORSTATE_CIRCLE_H
+#endif  //CANVAS_EDITORSTATE_SELECT_H
