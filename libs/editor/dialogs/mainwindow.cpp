@@ -39,10 +39,16 @@ void MainWindow::setup()
     flag = true;
 }
 
+#define STR_POLYGON "Polygon"
+#define STR_RECT "Rect"
+#define STR_CIRCLE "Circle"
+#define STR_DIG_RECT "Dig Rect"
+
 std::map<std::string, FSM_STATE> action_fsm_map{
-    {"Polygon", FSM_STATE::DRAW_POLYGON},
-    {"Rect", FSM_STATE::DRAW_RECT},
-    {"Circle", FSM_STATE::DRAW_CIRCLE},
+    {STR_POLYGON, FSM_STATE::DRAW_POLYGON},
+    {STR_RECT, FSM_STATE::DRAW_RECT},
+    {STR_CIRCLE, FSM_STATE::DRAW_CIRCLE},
+    {STR_DIG_RECT, FSM_STATE::DIG_RECT},
 };
 
 void MainWindow::create_menu_bar()
@@ -52,17 +58,20 @@ void MainWindow::create_menu_bar()
     std::vector<QAction*> actions;
 
     // NOTE: 增加动作时只需要增加下面三种即可，同时写到上面的map里
-    auto* drawPolygon = new QAction("Polygon");
-    auto* drawRect = new QAction("Rect");
-    auto* drawCircle = new QAction("Circle");
+    auto* drawPolygon = new QAction(STR_POLYGON);
+    auto* drawRect = new QAction(STR_RECT);
+    auto* drawCircle = new QAction(STR_CIRCLE);
+    auto* ditRect = new QAction(STR_DIG_RECT);
 
     drawMenu->addAction(drawPolygon);
     drawMenu->addAction(drawRect);
     drawMenu->addAction(drawCircle);
+    drawMenu->addAction(ditRect);
 
     actions.emplace_back(drawPolygon);
     actions.emplace_back(drawRect);
     actions.emplace_back(drawCircle);
+    actions.emplace_back(ditRect);
 
     for (int i = 0; i < actions.size(); ++i)
     {

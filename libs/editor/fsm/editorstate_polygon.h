@@ -57,6 +57,7 @@ class Editorstate_Polygon : public EditorState
     QGraphicsLineItem* _preview_temp_seg[_preview_temp_seg_cnt];  // 新预览线段对象
     QGraphicsLineItem* _preview_temp_arc_seg{};                   // 圆弧预览线段
     GraphicsArcItem* _preview_temp_arc{};                         // 圆弧预览
+    std::vector<GraphicsArcItem*> _preview_temp_arcs{};           // 已有圆弧预览
     QPointF _last_point{};                                        // 上次点击的坐标
     QPointF _cursor_point{};                                      // 当前点击的坐标
     QPointF _arc_start{};                                         // 圆弧起点
@@ -395,6 +396,7 @@ int Editorstate_Polygon::mouseLeftPressArcEvent(QGraphicsSceneMouseEvent* event)
             redcgl::Edge edge = qt_arc_to_edge(qt_arc);
             _shape_edges.emplace_back(edge);
 
+            _preview_temp_arcs.emplace_back(_preview_temp_arc);  // 缓存起来，最后要移除
             _preview_temp_arc = new GraphicsArcItem();
             _preview_temp_arc->setPen(QPen(Qt::red, 0));
             _context.get_scene()->addItem(_preview_temp_arc_seg);
@@ -461,15 +463,21 @@ int Editorstate_Polygon::add_graphics_polygon()
 }
 int Editorstate_Polygon::clear_preview_lines()
 {
+    // 移除线段预览
     for (auto* line : _preview_lines)
     {
         _context.get_scene()->removeItem(line);
     }
     _preview_lines.clear();
-
     // 释放使用过的边
     _shape_edges.clear();
 
+    // 移除圆弧预览
+    for (auto* arc : _preview_temp_arcs)
+    {
+        _context.get_scene()->removeItem(arc);
+    }
+    _preview_temp_arcs.clear();
     return 0;
 }
 

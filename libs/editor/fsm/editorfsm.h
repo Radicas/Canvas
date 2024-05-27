@@ -12,6 +12,7 @@ enum FSM_STATE
     DRAW_POLYGON,
     DRAW_RECT,
     DRAW_CIRCLE,
+    DIG_RECT,
 };
 
 class Context;

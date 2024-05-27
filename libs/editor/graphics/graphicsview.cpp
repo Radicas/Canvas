@@ -113,33 +113,32 @@ void GraphicsView::wheelEvent(QWheelEvent* event)
 void GraphicsView::drawForeground(QPainter* painter, const QRectF& rect)
 {
     // 绘制十字光标
+    QGraphicsView::drawForeground(painter, rect);
 
-    //    QGraphicsView::drawForeground(painter, rect);
-    //
-    //    double factorX = transform().m11();
-    //    double factorY = transform().m22();
-    //
-    //    double crossHairSize = 100.0;
-    //
-    //    double width = crossHairSize;
-    //    double height = crossHairSize;
-    //    if (crossHairSize * factorX < MIN_CROSS_HAIR_SIZE)
-    //    {
-    //        width = MIN_CROSS_HAIR_SIZE / factorX;
-    //    }
-    //    if (crossHairSize * factorY < MIN_CROSS_HAIR_SIZE)
-    //    {
-    //        height = MIN_CROSS_HAIR_SIZE / factorY;
-    //    }
-    //
-    //    QPen oldPen = painter->pen();
-    //    QPen newPen(oldPen);
-    //    newPen.setColor(Qt::yellow);
-    //    newPen.setCosmetic(true);
-    //    painter->setPen(newPen);
-    //    painter->drawLine(-width, 0, width, 0);
-    //    painter->drawLine(0, height, 0, -height);
-    //    painter->setPen(oldPen);
+    double factorX = transform().m11();
+    double factorY = transform().m22();
+
+    double crossHairSize = 100.0;
+
+    double width = crossHairSize;
+    double height = crossHairSize;
+    if (crossHairSize * factorX < MIN_CROSS_HAIR_SIZE)
+    {
+        width = MIN_CROSS_HAIR_SIZE / factorX;
+    }
+    if (crossHairSize * factorY < MIN_CROSS_HAIR_SIZE)
+    {
+        height = MIN_CROSS_HAIR_SIZE / factorY;
+    }
+
+    QPen oldPen = painter->pen();
+    QPen newPen(oldPen);
+    newPen.setColor(Qt::yellow);
+    newPen.setCosmetic(true);
+    painter->setPen(newPen);
+    painter->drawLine(-width, 0, width, 0);
+    painter->drawLine(0, height, 0, -height);
+    painter->setPen(oldPen);
 }
 
 void GraphicsView::drawBackground(QPainter* painter, const QRectF& rect)
