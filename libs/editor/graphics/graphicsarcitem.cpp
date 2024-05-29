@@ -91,7 +91,4 @@ void GraphicsArcItem::generate_arc(const QPointF& p1, const QPointF& p2, const Q
     end_angle = (redcgl::rad_to_degree(end_angle)) * 16;
     span_angle = redcgl::rad_to_degree(span_angle) * 16;
     _span_angle = ccw ? (int)span_angle : -(int)span_angle;
-
-    printf("start angle: %lf\t end angle : %lf\t span angle : %lf\n", _start_angle / 16.0, end_angle / 16.0,
-           _span_angle / 16.0);
 }

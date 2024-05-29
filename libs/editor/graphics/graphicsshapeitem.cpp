@@ -1,14 +1,13 @@
 #include "graphicsshapeitem.h"
 #include "convertor.h"
 
-GraphicsShapeItem::GraphicsShapeItem(const std::vector<redcgl::Edge>& edges)
-    : _pen(Qt::red, 0), _brush(Qt::green), _rect(), _path()
+GraphicsShapeItem::GraphicsShapeItem(F_POLYHEAD* poly_head)
+    : _pen(Qt::red, 0), _brush(Qt::green), _rect(), _path(), _poly_head(poly_head)
 {
-    init_polygon();
-    set_edges(edges);
     init_painter_path();
     _rect = _path.boundingRect();
 }
+
 GraphicsShapeItem::~GraphicsShapeItem() {}
 QRectF GraphicsShapeItem::boundingRect() const
 {
@@ -18,43 +17,9 @@ QPainterPath GraphicsShapeItem::shape() const
 {
     return _path;
 }
-int GraphicsShapeItem::set_edges(const std::vector<redcgl::Edge>& edges)
+F_POLYHEAD* GraphicsShapeItem::get_poly_head()
 {
-    _polygon.num_edges = (int)(edges.size());
-    if (_polygon.edges == nullptr)
-        _polygon.edges = (redcgl::Edge*)(malloc(_polygon.num_edges * sizeof(redcgl::Edge)));
-    else
-    {
-        // 重新分配内存
-        redcgl::Edge* temp = (redcgl::Edge*)(realloc(_polygon.edges, _polygon.num_edges * sizeof(redcgl::Edge)));
-        if (temp == nullptr)
-            return -1;
-        _polygon.edges = temp;
-    }
-
-    // 覆盖旧数据
-    for (int i = 0; i < _polygon.num_edges; ++i)
-    {
-        _polygon.edges[i] = edges[i];
-    }
-    return 1;
-}
-int GraphicsShapeItem::append_edge(const redcgl::Edge& edge)
-{
-    _polygon.num_edges++;
-    redcgl::Edge* temp = (redcgl::Edge*)realloc(_polygon.edges, 1);
-    if (temp == nullptr)
-    {
-        fprintf(stderr, "重新分配内存失败\n");
-        free(_polygon.edges);  // 释放原来的数组
-        return -1;
-    }
-    else
-    {
-        _polygon.edges = temp;  // 更新数组指针
-    }
-    _polygon.edges[_polygon.num_edges] = edge;
-    return 1;
+    return _poly_head;
 }
 int GraphicsShapeItem::set_pen(const QPen& pen)
 {
@@ -80,68 +45,75 @@ void GraphicsShapeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->drawRect(_rect);
     painter->restore();
 }
-int GraphicsShapeItem::init_polygon()
+QPainterPath GraphicsShapeItem::poly_head_to_path(F_POLYHEAD* poly_head)
 {
-    redcgl::empty_polygon(&_polygon);
-    return 1;
+    QPainterPath path;
+    // 遍历所有的多边形
+    while (poly_head)
+    {
+        F_POLYELEM* curr_elem = poly_head->APoint;  // 当前元素
+        F_POLYELEM* first_elem = curr_elem;         // 第一个元素
+        if (first_elem)
+            path.moveTo(first_elem->x, first_elem->y);  // 设置路径起点
+        else
+            return {};  // 没有元素，返回空路径
+        do
+        {
+            F_POLYELEM* next = curr_elem->Forwards;  // 作为线段或圆弧终点
+            if (curr_elem->radius == 0.0)            // 线段
+                path.lineTo(next->x, next->y);      // 绘制到下一个元素
+            else                                     // 圆弧
+            {
+                redcgl::Point start{curr_elem->x, curr_elem->y};
+                redcgl::Point end{next->x, next->y};
+                redcgl::Point center{curr_elem->cx, curr_elem->cy};
+                double start_angle, end_angle;
+                redcgl::calculate_angle_rad(&start, &center, &start_angle);
+                redcgl::calculate_angle_rad(&end, &center, &end_angle);
+
+                double cross = redcgl::cross_product(curr_elem->x - curr_elem->cx, curr_elem->y - curr_elem->cy,
+                                                     next->x - next->cx, next->y - next->cy);
+
+                double span_angle = 0.0;  // 旋转角度，给qt画arc用
+
+                if (cross < 0)  //  顺时针，外轮廓
+                {
+                    // 起始角度始终大于终止角度
+                    double tmp_s = start_angle == 0.0 ? start_angle + 2 * M_PI : start_angle;
+                    span_angle = tmp_s - end_angle;  // 计算出旋转角
+                }
+                else if (cross > 0)  // 逆时针，内轮廓
+                {
+                    // 终止角度始终大于起始角度
+                    double tmp_e = end_angle == 0.0 ? end_angle + 2 * M_PI : end_angle;
+                    span_angle = -(tmp_e - start_angle);  // 计算出旋转角
+                }
+
+                double abs_r = fabs(curr_elem->radius);
+                QRectF rect(center.x - abs_r, center.y - abs_r, 2 * abs_r, 2 * abs_r);
+                path.arcTo(rect, start_angle, span_angle);
+            }
+            curr_elem = next;  // 移动到下一个元素
+        } while (curr_elem && curr_elem != first_elem);
+
+        path.closeSubpath();
+        // 处理孔洞
+        if (poly_head->NextHole)
+        {
+            path.addPath(poly_head_to_path(poly_head->NextHole));
+        }
+
+        poly_head = poly_head->next;  // 移到下一个多边形
+    }
+    return path;
 }
-int GraphicsShapeItem::set_path_to_circle()
-{
-    auto& edge = _polygon.edges[0];
-    const QtArc arc = edge_to_qt_arc(edge);
-    _path.moveTo(edge.st.x, edge.st.y);
-    _path.arcTo(arc._rect, arc._start_angle / 16, arc._span_angle / 16);
-    return 1;
-}
+#include <qdebug.h>
 int GraphicsShapeItem::init_painter_path()
 {
-    redcgl::Polygon* curr_poly = &_polygon;
-    if (curr_poly == nullptr || curr_poly->edges == nullptr)
+    if (_poly_head == nullptr)
         return -1;
-
-    // 当前shape是圆
-    if (curr_poly->num_edges == 1 && curr_poly->edges[0].r != 0.0)
-        return set_path_to_circle();
-
-    while (curr_poly != nullptr)  // 遍历多边形
-    {
-        redcgl::Edge* first_edge = &curr_poly->edges[0];
-        _path.moveTo(first_edge->st.x, first_edge->st.y);  // 路径起点
-        for (int i = 1; i < curr_poly->num_edges; ++i)  // 外轮廓
-        {
-            redcgl::Edge* curr_edge = &curr_poly->edges[i];
-            if (curr_edge->r == 0.0)  // 线段
-            {
-                _path.lineTo(curr_edge->st.x, curr_edge->st.y);
-            }
-            else
-            {  // 圆弧
-                const QtArc qt_arc = edge_to_qt_arc(*curr_edge);
-                _path.arcTo(qt_arc._rect, qt_arc._start_angle / 16, qt_arc._span_angle / 16);
-            }
-        }
-        redcgl::Polygon* curr_hole = curr_poly->next_hole;
-        while (curr_hole != nullptr)
-        {
-            redcgl::Edge* first_hole_edge = &curr_poly->edges[0];
-            _path.moveTo(first_hole_edge->st.x, first_hole_edge->st.y);  // 路径起点
-            for (int i = 1; i < curr_hole->num_edges; ++i)               // 外轮廓
-            {
-                redcgl::Edge* curr_edge = &curr_hole->edges[i];
-                if (curr_edge->r == 0.0)  // 线段
-                {
-                    _path.lineTo(curr_edge->st.x, curr_edge->st.y);
-                }
-                else
-                {  // 圆弧
-                    const QtArc qt_arc = edge_to_qt_arc(*curr_edge);
-                    _path.arcTo(qt_arc._rect, qt_arc._start_angle / 16, qt_arc._span_angle / 16);
-                }
-            }
-            curr_hole = curr_hole->next_hole;
-        }
-        _path.closeSubpath();
-        curr_poly = curr_poly->next;
-    }
+    auto* curr_head = _poly_head;
+    _path = poly_head_to_path(curr_head);
+    qDebug() << _path;
     return 1;
 }

@@ -8,12 +8,13 @@
 class GraphicsShapeItem : public QGraphicsItem
 {
    public:
-    // TODO: 暂时默认shape只有一个多边形
-    explicit GraphicsShapeItem(const std::vector<redcgl::Edge>& edges);
+    explicit GraphicsShapeItem(F_POLYHEAD* poly_head);
     ~GraphicsShapeItem();
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
+    redcgl::Polygon& get_polygon();
+    F_POLYHEAD* get_poly_head();
 
     int set_pen(const QPen& pen);
     int set_brush(const QBrush& brush);
@@ -26,13 +27,14 @@ class GraphicsShapeItem : public QGraphicsItem
     int init_polygon();
     int init_painter_path();
     int set_path_to_circle();
+    QPainterPath poly_head_to_path(F_POLYHEAD* poly_head);
 
    private:
     QPen _pen;
     QBrush _brush;
     QRectF _rect;
     QPainterPath _path;
-    redcgl::Polygon _polygon;
+    F_POLYHEAD* _poly_head;
 };
 
 #endif  //CANVAS_GRAPHICSSHAPEITEM_H

@@ -140,23 +140,19 @@ void Editorstate_Rect::setup()
 }
 void Editorstate_Rect::add_rect()
 {
-    for (int i = 0; i < 4; ++i)
-    {
-        redcgl::Edge e;
-        redcgl::empty_edge(&e);
-        _shape_edges.emplace_back(e);
-    }
-    _shape_edges[0].st = {_last_point.x(), _last_point.y()};
-    _shape_edges[0].et = {_last_point.x(), _cursor_point.y()};
-    _shape_edges[1].st = {_last_point.x(), _cursor_point.y()};
-    _shape_edges[1].et = {_cursor_point.x(), _cursor_point.y()};
-    _shape_edges[2].st = {_cursor_point.x(), _cursor_point.y()};
-    _shape_edges[2].et = {_cursor_point.x(), _last_point.y()};
-    _shape_edges[3].st = {_cursor_point.x(), _last_point.y()};
-    _shape_edges[3].et = {_last_point.x(), _last_point.y()};
+    redcgl::Vertex vertices[4];
+    vertices[0] = redcgl::create_vertex(_last_point.x(), _last_point.y(), 0, 0, 0);
+    vertices[1] = redcgl::create_vertex(_last_point.x(), _cursor_point.y(), 0, 0, 0);
+    vertices[2] = redcgl::create_vertex(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
+    vertices[3] = redcgl::create_vertex(_cursor_point.x(), _last_point.y(), 0, 0, 0);
 
-    auto* shape = new GraphicsShapeItem(_shape_edges);
-    _context.get_scene()->addItem(shape);
+    F_POLYELEM* elem_1 = redcgl::build_poly_elems(vertices, 4);
+    F_POLYHEAD* poly_head = redcgl::build_poly_head(elem_1, NULL);
+    auto* shape_item = new GraphicsShapeItem(poly_head);
+    shape_item->set_pen(_pen);
+    shape_item->set_brush(_brush);
+    _context.get_scene()->addItem(shape_item);
+    shape_item->update();
 }
 
 void Editorstate_Rect::clear_cache()

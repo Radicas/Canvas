@@ -147,15 +147,7 @@ void Editorstate_Circle::setup()
 }
 void Editorstate_Circle::add_circle()
 {
-    redcgl::Edge e;
-    e.st = e.et = {_last_point.x() + _radius, _last_point.y()};
-    e.ct = {_last_point.x(), _last_point.y()};
-    e.sa = 0.0;
-    e.ea = 0.0;
-    e.r = _radius;
-    _shape_edges.emplace_back(e);
-    auto* shape = new GraphicsShapeItem(_shape_edges);
-    _context.get_scene()->addItem(shape);
+
 }
 
 void Editorstate_Circle::clear_cache()
