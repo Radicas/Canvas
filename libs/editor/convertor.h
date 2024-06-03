@@ -1,8 +1,12 @@
 #ifndef CANVAS_CONVERTOR_H
 #define CANVAS_CONVERTOR_H
 
-#include <redcgl/include/redcgl.h>
 #include <QRectF>
+
+namespace redcgl
+{
+struct Edge;
+}
 
 typedef struct qt_arc
 {

@@ -13,7 +13,7 @@ find_package(Qt5 REQUIRED
         Widgets
 )
 
-add_library(${LIB_NAME} STATIC
+add_library(${LIB_NAME} SHARED
         ${HEADERS}
         ${SOURCES}
 )
@@ -27,4 +27,11 @@ target_link_libraries(${LIB_NAME}
         Qt5::Core
         Qt5::Widgets
         redcgl
+)
+
+# 安装目标文件
+install(TARGETS ${LIB_NAME}
+        RUNTIME DESTINATION ${INSTALL_PATH}/bin
+        LIBRARY DESTINATION ${INSTALL_PATH}/lib
+        ARCHIVE DESTINATION ${INSTALL_PATH}/lib
 )

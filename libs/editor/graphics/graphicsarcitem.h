@@ -36,6 +36,7 @@ class GraphicsArcItem : public QGraphicsItem
     double _start_angle;  // 起始角度，需要乘以16
     double _span_angle;   // 旋转角度，正为逆时针，负为顺时针，需要乘以16
     QPen _pen;
+
 };
 
 #endif  // QGRAPHICSARCITEM_H

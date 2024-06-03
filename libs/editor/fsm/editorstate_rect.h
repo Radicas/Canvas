@@ -7,7 +7,7 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/redcgl.h"
+#include "redcgl/include/polygon.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>
@@ -48,7 +48,7 @@ class Editorstate_Rect : public EditorState
     QPointF _cursor_point{};                         // 当前点击的坐标
     STATE _state;                                    // 操作状态
     QGraphicsRectItem* _preview;                     // 预览矩形
-    std::vector<redcgl::Edge> _shape_edges{};        // shape的边
+    std::vector<redcgl::Edge*> _shape_edges{};       // shape的边
     std::vector<GraphicsShapeItem*> _shape_items{};  // 已有shape绘制对象
     QPen _pen;
     QBrush _brush;
@@ -140,15 +140,7 @@ void Editorstate_Rect::setup()
 }
 void Editorstate_Rect::add_rect()
 {
-    redcgl::Vertex vertices[4];
-    vertices[0] = redcgl::create_vertex(_last_point.x(), _last_point.y(), 0, 0, 0);
-    vertices[1] = redcgl::create_vertex(_last_point.x(), _cursor_point.y(), 0, 0, 0);
-    vertices[2] = redcgl::create_vertex(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
-    vertices[3] = redcgl::create_vertex(_cursor_point.x(), _last_point.y(), 0, 0, 0);
-
-    F_POLYELEM* elem_1 = redcgl::build_poly_elems(vertices, 4);
-    F_POLYHEAD* poly_head = redcgl::build_poly_head(elem_1, NULL);
-    auto* shape_item = new GraphicsShapeItem(poly_head);
+    auto* shape_item = new GraphicsShapeItem();
     shape_item->set_pen(_pen);
     shape_item->set_brush(_brush);
     _context.get_scene()->addItem(shape_item);

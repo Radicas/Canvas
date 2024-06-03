@@ -1,5 +1,12 @@
 #include "graphicsarcitem.h"
-#include "redcgl/include/redcgl.h"
+
+#include "redcgl/include/curve.h"
+#include "redcgl/include/edge.h"
+#include "redcgl/include/vector.h"
+
+#ifdef WIN32
+#include <math.h>
+#endif  // WIN32
 
 GraphicsArcItem::GraphicsArcItem() {}
 
@@ -76,16 +83,14 @@ void GraphicsArcItem::generate_arc(const QPointF& p1, const QPointF& p2, const Q
 
     QPointF vec_s_to_e = p2 - p1;
     QPointF vec_s_to_p = p3 - p1;
-    double cross = redcgl::cross_product(vec_s_to_e.x(), vec_s_to_e.y(), vec_s_to_p.x(), vec_s_to_p.y());
+    double cross = redcgl::cross_product_v(vec_s_to_e.x(), vec_s_to_e.y(), vec_s_to_p.x(), vec_s_to_p.y());
     int ccw = 0;
     if (cross > 0)
         ccw = 1;
 
-    redcgl::Edge e;
-    e.r = ccw ? -1 : 1;
-    e.sa = start_angle;
-    e.ea = end_angle;
-    double span_angle = redcgl::sweep_angle(&e);
+    double r = ccw ? -1 : 1;
+    redcgl::Edge* e = redcgl::create_edge(0, 0, 0, 0, 0, 0, r, start_angle, end_angle);
+    double span_angle = redcgl::sweep_angle(e);
 
     _start_angle = (redcgl::rad_to_degree(start_angle)) * 16;
     end_angle = (redcgl::rad_to_degree(end_angle)) * 16;

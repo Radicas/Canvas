@@ -8,7 +8,8 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/redcgl.h"
+#include "redcgl/include/curve.h"
+#include "redcgl/include/vector.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>
@@ -17,6 +18,10 @@
 #include <QMenu>
 #include <QPen>
 #include <QPointF>
+
+#ifdef WIN32
+#include <cmath>
+#endif
 
 //#define DEBUG_PREVIEW
 
@@ -51,7 +56,6 @@ class Editorstate_Polygon : public EditorState
     QMenu* _menu;  // 右键菜单
 
    private:
-    F_POLYHEAD* _poly_head = nullptr;
     std::vector<GraphicsShapeItem*> _shape_items{};               // 已有shape绘制对象
     std::vector<QGraphicsLineItem*> _preview_lines{};             // 已有的预览线段对象
     static const int _preview_temp_seg_cnt = 2;                   // 预览线数量
@@ -73,8 +77,7 @@ class Editorstate_Polygon : public EditorState
     void update_line_item(QGraphicsLineItem* l, QPointF& p1, QPointF& p2);
     int add_graphics_polygon();
     int clear_preview_lines();
-    redcgl::Edge qt_arc_to_edge(const QtArc& arc);
-    F_POLYELEM* qt_arc_to_poly_elems(const QtArc& arc);
+    redcgl::Edge* qt_arc_to_edge(const QtArc& arc);
     int cal_snap_45_strategy_1(QPointF& st, QPointF mp, QPointF& sp);
     int cal_snap_45_strategy_2(QPointF& st, QPointF mp, QPointF& sp);
     int cal_snap_45(double angle, int inclined, QPointF& p1, QPointF& p2, QPointF& res);
@@ -134,15 +137,15 @@ void Editorstate_Polygon::add_menus()
 void Editorstate_Polygon::init_poly_head()
 {
     // 创建一个空头
-    _poly_head = (F_POLYHEAD*)malloc(sizeof(F_POLYHEAD));
-    _poly_head->APoint = nullptr;
-    _poly_head->next = nullptr;
-    _poly_head->NextHole = nullptr;
-    _poly_head->mallocd_not_pooled = 0;
-    _poly_head->width = 0;
-    _poly_head->flag = 0;
-    _poly_head->pointer = nullptr;
-    _poly_head->userData = nullptr;
+    // _poly_head = (POLYGON_H*)malloc(sizeof(POLYGON_H));
+    // _poly_head->APoint = nullptr;
+    // _poly_head->next = nullptr;
+    // _poly_head->NextHole = nullptr;
+    // _poly_head->mallocd_not_pooled = 0;
+    // _poly_head->width = 0;
+    // _poly_head->flag = 0;
+    // _poly_head->pointer = nullptr;
+    // _poly_head->userData = nullptr;
 }
 void Editorstate_Polygon::entry()
 {
@@ -215,9 +218,9 @@ int Editorstate_Polygon::mouseMoveSegEvent(QGraphicsSceneMouseEvent* event)
                 is_inclined = (vec.x() != 0.0 && vec.y() != 0.0);
 
                 // 计算角度，根据角度选择策略
-                double dot = redcgl::dot_product(vec.x(), vec.y(), vec2.x(), vec2.y());
-                double vec_mag = redcgl::vec_magnitude(vec.x(), vec.y());
-                double vec_2_mag = redcgl::vec_magnitude(vec2.x(), vec2.y());
+                double dot = redcgl::dot_product_v(vec.x(), vec.y(), vec2.x(), vec2.y());
+                double vec_mag = redcgl::vec_magnitude_v(vec.x(), vec.y());
+                double vec_2_mag = redcgl::vec_magnitude_v(vec2.x(), vec2.y());
                 angle = acos(dot / (fabs(vec_mag) * fabs(vec_2_mag)));
             }
             // 计算目标点
@@ -260,9 +263,9 @@ int Editorstate_Polygon::mouseLeftPressSegEvent(QGraphicsSceneMouseEvent* event)
             }
 
             // 第一次点击，创建一个顶点元素
-            F_POLYELEM* elem = redcgl::build_poly_elem(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
-            elem->PToHead = _poly_head;
-            _poly_head->APoint = elem;
+            // F_POLYELEM* elem = redcgl::build_poly_elem(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
+            // elem->PToHead = _poly_head;
+            // _poly_head->APoint = elem;
             _state = STATE::ADD_EDGE;
             break;
         }
@@ -274,35 +277,35 @@ int Editorstate_Polygon::mouseLeftPressSegEvent(QGraphicsSceneMouseEvent* event)
                 _preview_lines.emplace_back(_preview_temp_seg[1]);
 
             // 创建一个元素
-            F_POLYELEM* elem1 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p1().x(),
-                                                        _preview_temp_seg[1]->line().p1().y(), 0, 0, 0);
-            elem1->PToHead = _poly_head;
+            // F_POLYELEM* elem1 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p1().x(),
+            //                                             _preview_temp_seg[1]->line().p1().y(), 0, 0, 0);
+            // elem1->PToHead = _poly_head;
 
             if (save_two == 1)
             {
-                F_POLYELEM* elem2 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p2().x(),
-                                                            _preview_temp_seg[1]->line().p2().y(), 0, 0, 0);
-                elem2->PToHead = _poly_head;
-                elem1->Forwards = elem2;
-                elem2->Backwards = elem1;
+                // F_POLYELEM* elem2 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p2().x(),
+                //                                             _preview_temp_seg[1]->line().p2().y(), 0, 0, 0);
+                // elem2->PToHead = _poly_head;
+                // elem1->Forwards = elem2;
+                // elem2->Backwards = elem1;
             }
 
             // 注意，添加的元素如果切换到圆弧了，需要去除
-            F_POLYELEM* elem_head = _poly_head->APoint;
-            F_POLYELEM* curr_elem = elem_head;
-            while (curr_elem->Forwards != nullptr)
-            {
-                curr_elem = curr_elem->Forwards;
-            }
-            curr_elem->Forwards = elem1;
-            elem1->Backwards = curr_elem;
+            // F_POLYELEM* elem_head = _poly_head->APoint;
+            // F_POLYELEM* curr_elem = elem_head;
+            // while (curr_elem->Forwards != nullptr)
+            // {
+            //     curr_elem = curr_elem->Forwards;
+            // }
+            // curr_elem->Forwards = elem1;
+            // elem1->Backwards = curr_elem;
 
             // 检查是否闭合
             if (check_closed())
             {
                 // 形成闭环
-                elem_head->Backwards = elem1;
-                elem1->Forwards = elem_head;
+                // elem_head->Backwards = elem1;
+                // elem1->Forwards = elem_head;
                 // 创建多边形
                 add_graphics_polygon();
                 // 去除预览线
@@ -421,7 +424,7 @@ int Editorstate_Polygon::mouseLeftPressArcEvent(QGraphicsSceneMouseEvent* event)
             // TODO: 修改poly_elem最后一个元素为圆弧,或者去除
             // TODO: 需要一个qt_arc转poly_elem的接口
 
-            qt_arc_to_poly_elems(qt_arc);
+            //            qt_arc_to_poly_elems(qt_arc);
 
             _preview_temp_arcs.emplace_back(_preview_temp_arc);  // 缓存起来，最后要移除
             _preview_temp_arc = new GraphicsArcItem();
@@ -482,7 +485,7 @@ int Editorstate_Polygon::check_closed()
 }
 int Editorstate_Polygon::add_graphics_polygon()
 {
-    GraphicsShapeItem* shape_item = new GraphicsShapeItem(_poly_head);
+    GraphicsShapeItem* shape_item = new GraphicsShapeItem();
     _context.get_scene()->addItem(shape_item);
     shape_item->update();
     return 0;
@@ -495,8 +498,6 @@ int Editorstate_Polygon::clear_preview_lines()
         _context.get_scene()->removeItem(line);
     }
     _preview_lines.clear();
-    // 归零poly_head
-    _poly_head = nullptr;
 
     // 移除圆弧预览
     for (auto* arc : _preview_temp_arcs)
@@ -506,7 +507,7 @@ int Editorstate_Polygon::clear_preview_lines()
     _preview_temp_arcs.clear();
     return 0;
 }
-redcgl::Edge Editorstate_Polygon::qt_arc_to_edge(const QtArc& arc)
+redcgl::Edge* Editorstate_Polygon::qt_arc_to_edge(const QtArc& arc)
 {
     // 可以作为中转，保留此接口，或许还可以用上
     double center_x, center_y, radius;
@@ -514,57 +515,26 @@ redcgl::Edge Editorstate_Polygon::qt_arc_to_edge(const QtArc& arc)
     center_x = rect.x() + rect.width() / 2.0;
     center_y = rect.y() + rect.height() / 2.0;
     radius = rect.width() / 2.0;
-    redcgl::Edge edge;
-    redcgl::empty_edge(&edge);
-    edge.ct.x = center_x;
-    edge.ct.y = center_y;
+
+    double sx, sy, ex, ey, cx, cy, r, sa, ea;
+
+    cx = center_x;
+    cy = center_y;
     int ccw = arc._span_angle > 0 ? 1 : 0;
-    edge.r = ccw ? -radius : radius;
-    edge.sa = redcgl::degree_to_rad(arc._start_angle / 16.0);
+    r = ccw ? -radius : radius;
+    sa = redcgl::degree_to_rad(arc._start_angle / 16.0);
     double span_angle = redcgl::degree_to_rad((arc._span_angle / 16.0));
-    double tea = edge.sa + span_angle;
-    edge.ea = fmod(tea, 2 * M_PI);
+    double tea = sa + span_angle;
+    ea = fmod(tea, 2 * M_PI);
 
-    double abs_r = fabs(edge.r);
-    edge.st.x = edge.ct.x + abs_r + cos(edge.sa);
-    edge.st.y = edge.ct.y + abs_r + sin(edge.sa);
-    edge.et.x = edge.ct.x + abs_r + cos(edge.ea);
-    edge.et.y = edge.ct.y + abs_r + sin(edge.ea);
+    double abs_r = fabs(r);
+    sx = cx + abs_r + cos(sa);
+    sy = cy + abs_r + sin(sa);
+    ex = cx + abs_r + cos(ea);
+    ey = cy + abs_r + sin(ea);
 
+    redcgl::Edge* edge = redcgl::create_edge(sx, sy, ex, ey, cx, cy, r, sa, ea);
     return edge;
-}
-F_POLYELEM* Editorstate_Polygon::qt_arc_to_poly_elems(const QtArc& arc)
-{
-    redcgl::Edge edge = qt_arc_to_edge(arc);
-    printf("Edge edge = {{%lf, %lf}, {%lf, %lf}, {%lf, %lf}, %lf, degree_to_rad(%lf), degree_to_rad(%lf)}\n;",
-           edge.st.x, edge.st.y, edge.et.x, edge.et.y, edge.ct.x, edge.ct.y, edge.r, edge.sa, edge.ea);
-
-    redcgl::Edge edges[4];
-    int cnt = redcgl::decompose_arc(&edge, edges);
-
-    if (0 == cnt)
-        return nullptr;  // 分解失败
-
-    // 分解为几段，则有几个poly_elem
-    redcgl::Vertex arc_vertices[cnt];
-    for (int i = 0; i < cnt; ++i)
-    {
-        auto* arc = &edges[i];
-        arc_vertices[i].x = arc->st.x;
-        arc_vertices[i].y = arc->st.y;
-        arc_vertices[i].cx = arc->ct.x;
-        arc_vertices[i].cy = arc->ct.y;
-
-        double abs_r = fabs(arc->r);
-        double local_epsilon = 1E-12;
-        if (arc->st.x > arc->ct.x + local_epsilon)
-            arc_vertices[i].r = -abs_r;
-        else if (arc->st.x + local_epsilon < arc->ct.x)
-            arc_vertices[i].r = abs_r;
-        else {
-            if()
-        }
-    }
 }
 int Editorstate_Polygon::cal_snap_45_strategy_1(QPointF& st, QPointF mp, QPointF& sp)
 {

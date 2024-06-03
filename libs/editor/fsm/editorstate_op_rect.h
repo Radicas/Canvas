@@ -7,8 +7,6 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/guts.h"
-#include "redcgl/include/redcgl.h"
 #include "tools/timer.h"
 
 #include <QAction>
@@ -116,31 +114,30 @@ int Editorstate_Op_Rect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
 void Editorstate_Op_Rect::do_op()
 {
+    // auto* subject = _selected_shape->get_poly_head();
 
-    auto* subject = _selected_shape->get_poly_head();
+    // redcgl::Vertex vertices[4];
+    // vertices[0] = redcgl::create_vertex(_last_point.x(), _last_point.y(), 0, 0, 0);
+    // vertices[1] = redcgl::create_vertex(_last_point.x(), _cursor_point.y(), 0, 0, 0);
+    // vertices[2] = redcgl::create_vertex(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
+    // vertices[3] = redcgl::create_vertex(_cursor_point.x(), _last_point.y(), 0, 0, 0);
 
-    redcgl::Vertex vertices[4];
-    vertices[0] = redcgl::create_vertex(_last_point.x(), _last_point.y(), 0, 0, 0);
-    vertices[1] = redcgl::create_vertex(_last_point.x(), _cursor_point.y(), 0, 0, 0);
-    vertices[2] = redcgl::create_vertex(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
-    vertices[3] = redcgl::create_vertex(_cursor_point.x(), _last_point.y(), 0, 0, 0);
+    // F_POLYELEM* elem_1 = redcgl::build_poly_elems(vertices, 4);
+    // F_POLYHEAD* clipper = redcgl::build_poly_head(elem_1, NULL);
 
-    F_POLYELEM* elem_1 = redcgl::build_poly_elems(vertices, 4);
-    F_POLYHEAD* clipper = redcgl::build_poly_head(elem_1, NULL);
+    // F_POLYHEAD* new_head = NULL;
+    // {
+    //     printf("real cost\n");
+    //     Timer t;
+    //     new_head = redcgl::logical_operation(subject, _operation, clipper);
+    // }
+    // GraphicsShapeItem* new_shape_item = new GraphicsShapeItem(new_head);
 
-    F_POLYHEAD* new_head = NULL;
-    {
-        printf("real cost\n");
-        Timer t;
-        new_head = redcgl::logical_operation(subject, _operation, clipper);
-    }
-    GraphicsShapeItem* new_shape_item = new GraphicsShapeItem(new_head);
+    // _context.get_scene()->addItem(new_shape_item);
+    // _context.get_scene()->removeItem(_selected_shape);
+    // _selected_shape = nullptr;
 
-    _context.get_scene()->addItem(new_shape_item);
-    _context.get_scene()->removeItem(_selected_shape);
-    _selected_shape = nullptr;
-
-    _context.get_scene()->removeItem(_preview);
+    // _context.get_scene()->removeItem(_preview);
 }
 
 int Editorstate_Op_Rect::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)

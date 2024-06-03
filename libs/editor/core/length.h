@@ -3,6 +3,11 @@
 
 #include <limits>
 
-typedef uint32_t Length;
+#ifdef _WIN32
+#elif __unix
+#elif __APPLE__
+#endif
+
+typedef unsigned Length;
 
 #endif  //CANVAS_LENGTH_H

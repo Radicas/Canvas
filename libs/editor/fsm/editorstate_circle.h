@@ -1,7 +1,3 @@
-//
-// Created by Radica on 2024/5/19.
-//
-
 #ifndef CANVAS_EDITORSTATE_CIRCLE_H
 #define CANVAS_EDITORSTATE_CIRCLE_H
 
@@ -11,7 +7,8 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/redcgl.h"
+#include "redcgl/include/distance.h"
+#include "redcgl/include/edge.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>
@@ -53,7 +50,7 @@ class Editorstate_Circle : public EditorState
     STATE _state;                                    // 操作状态
     QGraphicsEllipseItem* _preview;                  // 预览矩形
     double _radius;                                  // 圆形半径
-    std::vector<redcgl::Edge> _shape_edges{};        // shape的边
+    std::vector<redcgl::Edge*> _shape_edges{};       // shape的边
     std::vector<GraphicsShapeItem*> _shape_items{};  // 已有shape绘制对象
     QPen _pen;
     QBrush _brush;
@@ -86,7 +83,7 @@ int Editorstate_Circle::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
             break;
         case STATE::ADD_RECT:
         {
-            _radius = redcgl::dist_pt_vs_pt(_last_point.x(), _last_point.y(), _cursor_point.x(), _cursor_point.y());
+            redcgl::dist_pt_vs_pt_v(_last_point.x(), _last_point.y(), _cursor_point.x(), _cursor_point.y(), &_radius);
             QRectF rect(_last_point.x() - _radius, _last_point.y() - _radius, 2 * _radius, 2 * _radius);
             _preview->setRect(rect);
             _preview->setStartAngle(0);
@@ -145,10 +142,7 @@ void Editorstate_Circle::setup()
     _preview->setPen(_pen);
     _preview->setBrush(_brush);
 }
-void Editorstate_Circle::add_circle()
-{
-
-}
+void Editorstate_Circle::add_circle() {}
 
 void Editorstate_Circle::clear_cache()
 {
