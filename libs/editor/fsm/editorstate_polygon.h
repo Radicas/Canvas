@@ -485,9 +485,6 @@ int Editorstate_Polygon::check_closed()
 }
 int Editorstate_Polygon::add_graphics_polygon()
 {
-    GraphicsShapeItem* shape_item = new GraphicsShapeItem();
-    _context.get_scene()->addItem(shape_item);
-    shape_item->update();
     return 0;
 }
 int Editorstate_Polygon::clear_preview_lines()

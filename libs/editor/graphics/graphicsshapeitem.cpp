@@ -1,5 +1,7 @@
 #include "graphicsshapeitem.h"
 #include "convertor.h"
+#include "redcgl/include/edge.h"
+#include "redcgl/include/polygon.h"
 
 GraphicsShapeItem::GraphicsShapeItem(redcgl::Polygon* polygon)
     : _pen(Qt::red, 0), _brush(Qt::green), _rect(), _polygon(polygon), _poly_head(nullptr), _path()
@@ -46,14 +48,57 @@ void GraphicsShapeItem::setup()
     void init_path();
     void init_poly_head();
 }
-void GraphicsShapeItem::init_path() {
+
+void GraphicsShapeItem::init_path()
+{
     auto* curr_poly = _polygon;
-    while(_polygon != nullptr)
+    while (curr_poly != nullptr)
     {
         // logic
+        _path.addPath(simple_polygon_to_path(curr_poly));
 
+        redcgl::Polygon* hole = redcgl::polygon_get_hole(curr_poly);
+        redcgl::Polygon* curr_hole = hole;
+        while (curr_hole != nullptr)
+        {
+            // logic
+            _path.addPath(simple_polygon_to_path(curr_hole));
+            curr_hole = redcgl::next_hole(curr_hole);
+        }
+        curr_poly = redcgl::next_polygon(curr_poly);
     }
 }
-void GraphicsShapeItem::init_poly_head() {
+void GraphicsShapeItem::init_poly_head() {}
 
+QPainterPath GraphicsShapeItem::simple_polygon_to_path(redcgl::Polygon* poly)
+{
+    if (poly == NULL)
+        return {};
+    QPainterPath path;
+    int edges_num = redcgl::polygon_edges_number(poly);
+    if (edges_num == 0)
+        return {};
+    redcgl::Edge* edges = redcgl::polygon_get_edges(poly);
+    redcgl::Edge* first_edge = redcgl::get_edge(edges, 0);
+    path.moveTo(redcgl::edge_get_st_x(first_edge), redcgl::edge_get_st_y(first_edge));
+
+    for (int i = 0; i < edges_num; ++i)
+    {
+        redcgl::Edge* edge = redcgl::get_edge(edges, i);
+        double ex = redcgl::edge_get_et_x(edge);
+        double ey = redcgl::edge_get_et_y(edge);
+        double radius = redcgl::edge_get_radius(edge);
+
+        if (radius == 0.0)  // 线段
+        {
+            path.lineTo(ex, ey);
+        }
+        else  // 圆弧
+        {
+            const QtArc qt_arc = edge_to_qt_arc(*edge);
+            path.arcTo(qt_arc._rect, qt_arc._start_angle / 16, qt_arc._span_angle / 16);
+        }
+    }
+    path.closeSubpath();
+    return path;
 }

@@ -140,11 +140,6 @@ void Editorstate_Rect::setup()
 }
 void Editorstate_Rect::add_rect()
 {
-    auto* shape_item = new GraphicsShapeItem();
-    shape_item->set_pen(_pen);
-    shape_item->set_brush(_brush);
-    _context.get_scene()->addItem(shape_item);
-    shape_item->update();
 }
 
 void Editorstate_Rect::clear_cache()

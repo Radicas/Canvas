@@ -24,6 +24,7 @@ class GraphicsShapeItem : public QGraphicsItem
     void setup();
     void init_path();
     void init_poly_head();
+    QPainterPath simple_polygon_to_path(redcgl::Polygon* poly);
 
    private:
 
