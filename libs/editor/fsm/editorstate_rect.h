@@ -58,7 +58,11 @@ Editorstate_Rect::Editorstate_Rect(const Context& context) : EditorState(context
 {
     setup();
 }
-Editorstate_Rect::~Editorstate_Rect() {}
+Editorstate_Rect::~Editorstate_Rect()
+{
+    if (_preview)
+        delete _preview;
+}
 void Editorstate_Rect::entry()
 {
     printf("enter draw rect\n");
@@ -92,6 +96,7 @@ int Editorstate_Rect::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 }
 int Editorstate_Rect::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
 {
+    printf("draw rect left mouse press\n");
     Grid g;
     Point p = event->scenePos().toPoint();
     g.map_to_grid(p);
@@ -101,6 +106,7 @@ int Editorstate_Rect::mouseLeftPressEvent(QGraphicsSceneMouseEvent* event)
         case STATE::IDLE:
         {
             _last_point = _cursor_point;
+            _preview->setRect({});
             _context.get_scene()->addItem(_preview);
             _state = STATE::ADD_RECT;
             break;
@@ -129,7 +135,6 @@ int Editorstate_Rect::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
     return EditorState::mouseReleaseEvent(event);
 }
-
 void Editorstate_Rect::setup()
 {
     _pen = {Qt::red, 0};
@@ -137,11 +142,17 @@ void Editorstate_Rect::setup()
     _preview = new QGraphicsRectItem();
     _preview->setPen(_pen);
     _preview->setBrush(_brush);
+
+    _state = STATE::IDLE;
 }
 void Editorstate_Rect::add_rect()
 {
+    const auto& rect = _preview->rect();
+    redcgl::Polygon* poly = qt_rect_f_to_polygon(rect);
+    auto* shape_item = new GraphicsShapeItem(poly);
+    _context.get_scene()->addItem(shape_item);
+    shape_item->update();
 }
-
 void Editorstate_Rect::clear_cache()
 {
     _context.get_scene()->removeItem(_preview);

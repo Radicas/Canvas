@@ -3,10 +3,30 @@
 #include "redcgl/include/edge.h"
 #include "redcgl/include/polygon.h"
 
+#include <qdebug.h>
+
 GraphicsShapeItem::GraphicsShapeItem(redcgl::Polygon* polygon)
     : _pen(Qt::red, 0), _brush(Qt::green), _rect(), _polygon(polygon), _poly_head(nullptr), _path()
 {
-    setup();
+    auto* curr_poly = _polygon;
+    while (curr_poly != nullptr)
+    {
+        // outer
+        _path.addPath(simple_polygon_to_path(curr_poly));
+
+        qDebug() << _path;
+
+        redcgl::Polygon* hole = redcgl::polygon_get_hole(curr_poly);
+        redcgl::Polygon* curr_hole = hole;
+        while (curr_hole != nullptr)
+        {
+            // holes
+            _path.addPath(simple_polygon_to_path(curr_hole));
+            curr_hole = redcgl::next_hole(curr_hole);
+        }
+        curr_poly = redcgl::next_polygon(curr_poly);
+    }
+    polygon_to_poly_h();
 }
 
 GraphicsShapeItem::~GraphicsShapeItem() {}
@@ -42,34 +62,10 @@ void GraphicsShapeItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->drawRect(_rect);
     painter->restore();
 }
-
-void GraphicsShapeItem::setup()
+void GraphicsShapeItem::polygon_to_poly_h()
 {
-    void init_path();
-    void init_poly_head();
+    
 }
-
-void GraphicsShapeItem::init_path()
-{
-    auto* curr_poly = _polygon;
-    while (curr_poly != nullptr)
-    {
-        // logic
-        _path.addPath(simple_polygon_to_path(curr_poly));
-
-        redcgl::Polygon* hole = redcgl::polygon_get_hole(curr_poly);
-        redcgl::Polygon* curr_hole = hole;
-        while (curr_hole != nullptr)
-        {
-            // logic
-            _path.addPath(simple_polygon_to_path(curr_hole));
-            curr_hole = redcgl::next_hole(curr_hole);
-        }
-        curr_poly = redcgl::next_polygon(curr_poly);
-    }
-}
-void GraphicsShapeItem::init_poly_head() {}
-
 QPainterPath GraphicsShapeItem::simple_polygon_to_path(redcgl::Polygon* poly)
 {
     if (poly == NULL)

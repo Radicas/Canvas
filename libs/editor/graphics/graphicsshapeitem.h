@@ -20,13 +20,8 @@ class GraphicsShapeItem : public QGraphicsItem
 
    protected:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
-
-    void setup();
-    void init_path();
-    void init_poly_head();
+    void polygon_to_poly_h();
     QPainterPath simple_polygon_to_path(redcgl::Polygon* poly);
-
-   private:
 
     QPen _pen;
     QBrush _brush;

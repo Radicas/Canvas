@@ -56,6 +56,7 @@ class Editorstate_Polygon : public EditorState
     QMenu* _menu;  // 右键菜单
 
    private:
+    std::vector<redcgl::Edge*> _edges;
     std::vector<GraphicsShapeItem*> _shape_items{};               // 已有shape绘制对象
     std::vector<QGraphicsLineItem*> _preview_lines{};             // 已有的预览线段对象
     static const int _preview_temp_seg_cnt = 2;                   // 预览线数量
@@ -261,11 +262,6 @@ int Editorstate_Polygon::mouseLeftPressSegEvent(QGraphicsSceneMouseEvent* event)
             {
                 _context.get_scene()->addItem(i);
             }
-
-            // 第一次点击，创建一个顶点元素
-            // F_POLYELEM* elem = redcgl::build_poly_elem(_cursor_point.x(), _cursor_point.y(), 0, 0, 0);
-            // elem->PToHead = _poly_head;
-            // _poly_head->APoint = elem;
             _state = STATE::ADD_EDGE;
             break;
         }
@@ -275,37 +271,17 @@ int Editorstate_Polygon::mouseLeftPressSegEvent(QGraphicsSceneMouseEvent* event)
             _preview_lines.emplace_back(_preview_temp_seg[0]);
             if (save_two == 1)
                 _preview_lines.emplace_back(_preview_temp_seg[1]);
-
-            // 创建一个元素
-            // F_POLYELEM* elem1 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p1().x(),
-            //                                             _preview_temp_seg[1]->line().p1().y(), 0, 0, 0);
-            // elem1->PToHead = _poly_head;
-
+            auto start = _preview_temp_seg->line
             if (save_two == 1)
             {
-                // F_POLYELEM* elem2 = redcgl::build_poly_elem(_preview_temp_seg[1]->line().p2().x(),
-                //                                             _preview_temp_seg[1]->line().p2().y(), 0, 0, 0);
-                // elem2->PToHead = _poly_head;
-                // elem1->Forwards = elem2;
-                // elem2->Backwards = elem1;
-            }
 
-            // 注意，添加的元素如果切换到圆弧了，需要去除
-            // F_POLYELEM* elem_head = _poly_head->APoint;
-            // F_POLYELEM* curr_elem = elem_head;
-            // while (curr_elem->Forwards != nullptr)
-            // {
-            //     curr_elem = curr_elem->Forwards;
-            // }
-            // curr_elem->Forwards = elem1;
-            // elem1->Backwards = curr_elem;
+            }
 
             // 检查是否闭合
             if (check_closed())
             {
                 // 形成闭环
-                // elem_head->Backwards = elem1;
-                // elem1->Forwards = elem_head;
+
                 // 创建多边形
                 add_graphics_polygon();
                 // 去除预览线
