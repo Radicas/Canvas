@@ -1,15 +1,16 @@
 #ifndef CANVAS_EDITORSTATE_POLYGON_H
 #define CANVAS_EDITORSTATE_POLYGON_H
 
-#include "convertor.h"
 #include "core/context.h"
 #include "core/grid.h"
 #include "editorstate.h"
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/curve.h"
-#include "redcgl/include/vector.h"
+#include "redcgl/inc/redcgl/angle.h"
+#include "redcgl/inc/redcgl/arc_op.h"
+#include "redcgl/inc/redcgl/vector.h"
+#include "tools/convertor.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>
@@ -271,11 +272,11 @@ int Editorstate_Polygon::mouseLeftPressSegEvent(QGraphicsSceneMouseEvent* event)
             _preview_lines.emplace_back(_preview_temp_seg[0]);
             if (save_two == 1)
                 _preview_lines.emplace_back(_preview_temp_seg[1]);
-            auto start = _preview_temp_seg->line
-            if (save_two == 1)
-            {
-
-            }
+            //            auto start = _preview_temp_seg->line;
+            //            if (save_two == 1)
+            //            {
+            //
+            //            }
 
             // 检查是否闭合
             if (check_closed())

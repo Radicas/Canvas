@@ -4,7 +4,7 @@
 
 #include "editorstate_select.h"
 Editorstate_Select::Editorstate_Select(const Context& context) : EditorState(context) {}
-Editorstate_Select::~Editorstate_Select() {}
+Editorstate_Select::~Editorstate_Select() = default;
 void Editorstate_Select::entry()
 {
     EditorState::entry();

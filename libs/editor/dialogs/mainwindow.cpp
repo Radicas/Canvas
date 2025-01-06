@@ -42,13 +42,13 @@ void MainWindow::setup()
 #define STR_POLYGON "Polygon"
 #define STR_RECT "Rect"
 #define STR_CIRCLE "Circle"
-#define STR_DIG_RECT "Dig Rect"
+#define CGAL_TEST "CGAL_TEST"
 
 std::map<std::string, FSM_STATE> action_fsm_map{
     {STR_POLYGON, FSM_STATE::DRAW_POLYGON},
     {STR_RECT, FSM_STATE::DRAW_RECT},
     {STR_CIRCLE, FSM_STATE::DRAW_CIRCLE},
-    {STR_DIG_RECT, FSM_STATE::DIG_RECT},
+    {CGAL_TEST, FSM_STATE::CGAL},
 };
 
 void MainWindow::create_menu_bar()
@@ -61,17 +61,17 @@ void MainWindow::create_menu_bar()
     auto* drawPolygon = new QAction(STR_POLYGON);
     auto* drawRect = new QAction(STR_RECT);
     auto* drawCircle = new QAction(STR_CIRCLE);
-    auto* ditRect = new QAction(STR_DIG_RECT);
+    auto* CGALTest = new QAction(CGAL_TEST);
 
     drawMenu->addAction(drawPolygon);
     drawMenu->addAction(drawRect);
     drawMenu->addAction(drawCircle);
-    drawMenu->addAction(ditRect);
+    drawMenu->addAction(CGALTest);
 
     actions.emplace_back(drawPolygon);
     actions.emplace_back(drawRect);
     actions.emplace_back(drawCircle);
-    actions.emplace_back(ditRect);
+    actions.emplace_back(CGALTest);
 
     for (int i = 0; i < actions.size(); ++i)
     {

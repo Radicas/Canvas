@@ -1,6 +1,6 @@
 #include "editorfsm.h"
+#include "editorstate_cgal_test.h"
 #include "editorstate_circle.h"
-#include "editorstate_op_rect.h"
 #include "editorstate_polygon.h"
 #include "editorstate_rect.h"
 #include "editorstate_select.h"
@@ -26,7 +26,7 @@ void EditorFsm::setup()
     _fsm_states[DRAW_POLYGON] = new Editorstate_Polygon(_context);
     _fsm_states[DRAW_RECT] = new Editorstate_Rect(_context);
     _fsm_states[DRAW_CIRCLE] = new Editorstate_Circle(_context);
-    _fsm_states[DIG_RECT] = new Editorstate_Op_Rect(_context);
+    _fsm_states[CGAL] = new EditorState_CGAL_Test(_context);
 }
 
 void EditorFsm::set_current_state(FSM_STATE state)

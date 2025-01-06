@@ -1,7 +1,7 @@
 #include "graphicsshapeitem.h"
-#include "convertor.h"
-#include "redcgl/include/edge.h"
-#include "redcgl/include/polygon.h"
+#include "redcgl/inc/redcgl/edge.h"
+#include "redcgl/inc/redcgl/polygon.h"
+#include "tools/convertor.h"
 
 #include <qdebug.h>
 
@@ -16,15 +16,15 @@ GraphicsShapeItem::GraphicsShapeItem(redcgl::Polygon* polygon)
 
         qDebug() << _path;
 
-        redcgl::Polygon* hole = redcgl::polygon_get_hole(curr_poly);
+        redcgl::Polygon* hole = redcgl::polygon_get_next_hole(curr_poly);
         redcgl::Polygon* curr_hole = hole;
         while (curr_hole != nullptr)
         {
             // holes
             _path.addPath(simple_polygon_to_path(curr_hole));
-            curr_hole = redcgl::next_hole(curr_hole);
+            curr_hole = redcgl::polygon_get_next_hole(curr_hole);
         }
-        curr_poly = redcgl::next_polygon(curr_poly);
+        curr_poly = redcgl::polygon_get_next_hole(curr_poly);
     }
     polygon_to_poly_h();
 }
@@ -71,16 +71,16 @@ QPainterPath GraphicsShapeItem::simple_polygon_to_path(redcgl::Polygon* poly)
     if (poly == NULL)
         return {};
     QPainterPath path;
-    int edges_num = redcgl::polygon_edges_number(poly);
+    int edges_num = redcgl::polygon_get_edges_number(poly);
     if (edges_num == 0)
         return {};
     redcgl::Edge* edges = redcgl::polygon_get_edges(poly);
-    redcgl::Edge* first_edge = redcgl::get_edge(edges, 0);
+    redcgl::Edge* first_edge = redcgl::edge_at(edges, 0);
     path.moveTo(redcgl::edge_get_st_x(first_edge), redcgl::edge_get_st_y(first_edge));
 
     for (int i = 0; i < edges_num; ++i)
     {
-        redcgl::Edge* edge = redcgl::get_edge(edges, i);
+        redcgl::Edge* edge = redcgl::edge_at(edges, i);
         double ex = redcgl::edge_get_et_x(edge);
         double ey = redcgl::edge_get_et_y(edge);
         double radius = redcgl::edge_get_radius(edge);

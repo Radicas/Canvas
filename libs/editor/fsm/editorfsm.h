@@ -12,7 +12,7 @@ enum FSM_STATE
     DRAW_POLYGON,
     DRAW_RECT,
     DRAW_CIRCLE,
-    DIG_RECT,
+    CGAL,
 };
 
 class Context;
@@ -21,7 +21,7 @@ class EditorFsm : public QObject, public EventHandler
 {
    public:
     explicit EditorFsm(const Context& context);
-    ~EditorFsm();
+    ~EditorFsm() override;
 
     void set_current_state(FSM_STATE state);
 

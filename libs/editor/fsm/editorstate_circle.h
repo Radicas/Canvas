@@ -7,8 +7,8 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/distance.h"
-#include "redcgl/include/edge.h"
+#include "redcgl/inc/redcgl/distance.h"
+#include "redcgl/inc/redcgl/edge.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>

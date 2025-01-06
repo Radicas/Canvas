@@ -10,7 +10,7 @@ Grid::Grid()
 {
 }
 
-Grid::Grid(const Length& interval_x, const Length& interval_y) : _grid_type(GRID_TYPE::DOTS)
+Grid::Grid(const Length& interval_x, const Length& interval_y) : _grid_type(GRID_TYPE::LINES)
 {
     set_interval_x(interval_x);
     set_interval_y(interval_y);

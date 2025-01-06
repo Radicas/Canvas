@@ -11,8 +11,8 @@ class Context;
 class Editorstate_Select : public EditorState
 {
    public:
-    Editorstate_Select(const Context& context);
-    ~Editorstate_Select();
+    explicit Editorstate_Select(const Context& context);
+    ~Editorstate_Select() override;
 
     void entry() override;
     void exit() override;

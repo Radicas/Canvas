@@ -1,7 +1,7 @@
 #ifndef CANVAS_GRAPHICSSHAPEITEM_H
 #define CANVAS_GRAPHICSSHAPEITEM_H
 
-#include "redcgl/include/polygon.h"
+#include "redcgl/inc/redcgl/polygon.h"
 
 #include <QGraphicsItem>
 #include <QPainter>

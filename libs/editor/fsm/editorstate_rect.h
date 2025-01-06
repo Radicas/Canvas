@@ -7,7 +7,7 @@
 #include "graphics/graphicsarcitem.h"
 #include "graphics/graphicsscene.h"
 #include "graphics/graphicsshapeitem.h"
-#include "redcgl/include/polygon.h"
+#include "redcgl/inc/redcgl/polygon.h"
 
 #include <QAction>
 #include <QGraphicsEllipseItem>

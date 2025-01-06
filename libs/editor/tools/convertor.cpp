@@ -1,8 +1,9 @@
 #include "convertor.h"
 
-#include "redcgl/include/curve.h"
-#include "redcgl/include/edge.h"
-#include "redcgl/include/polygon.h"
+#include "redcgl/inc/redcgl/angle.h"
+#include "redcgl/inc/redcgl/arc_op.h"
+#include "redcgl/inc/redcgl/edge.h"
+#include "redcgl/inc/redcgl/polygon.h"
 
 #ifdef WIN32
 #include <cmath>
@@ -47,7 +48,7 @@ QtArc edge_to_qt_arc(Edge& e)
 
 Polygon* qt_rect_f_to_polygon(const QRectF& rect)
 {
-    Polygon* poly = NULL;
+    Polygon* poly = nullptr;
     Edge* edges = redcgl::create_empty_edge_array(4);
 
     auto top_left = rect.topLeft();
@@ -55,10 +56,10 @@ Polygon* qt_rect_f_to_polygon(const QRectF& rect)
     auto btm_right = rect.bottomRight();
     auto top_right = rect.topRight();
 
-    Edge* edge0 = get_edge(edges, 0);
-    Edge* edge1 = get_edge(edges, 1);
-    Edge* edge2 = get_edge(edges, 2);
-    Edge* edge3 = get_edge(edges, 3);
+    Edge* edge0 = redcgl::edge_at(edges, 0);
+    Edge* edge1 = redcgl::edge_at(edges, 1);
+    Edge* edge2 = redcgl::edge_at(edges, 2);
+    Edge* edge3 = redcgl::edge_at(edges, 3);
 
     redcgl::edge_set_values(edge0, top_left.x(), top_left.y(), btm_left.x(), btm_left.y(), 0, 0, 0, 0, 0);
     redcgl::edge_set_values(edge1, btm_left.x(), btm_left.y(), btm_right.x(), btm_right.y(), 0, 0, 0, 0, 0);

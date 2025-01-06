@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H_
 #define MAINWINDOW_H_
 
-#include "eventhandler.h"
+#include "fsm/eventhandler.h"
 
 #include <QMainWindow>
 
@@ -17,8 +17,6 @@ class MainWindow : public QMainWindow
    protected:
     void setup();
     void create_menu_bar();
-
-   private slots:
 
    private:
     GraphicsView* _view;

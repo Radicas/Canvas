@@ -1,8 +1,11 @@
 #include "graphicsarcitem.h"
 
-#include "redcgl/include/curve.h"
-#include "redcgl/include/edge.h"
-#include "redcgl/include/vector.h"
+#include "redcgl/inc/redcgl/angle.h"
+#include "redcgl/inc/redcgl/arc_op.h"
+#include "redcgl/inc/redcgl/circle.h"
+#include "redcgl/inc/redcgl/edge.h"
+#include "redcgl/inc/redcgl/polygon.h"
+#include "redcgl/inc/redcgl/vector.h"
 
 #ifdef WIN32
 #include <math.h>
